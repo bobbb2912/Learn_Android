@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Learn_TabBar</string>
+    <string name="tab_text_1">Game</string>
+    <string name="tab_text_2">Music</string>
+    <string name="tab_text_3">Sport</string>
+
+</resources>

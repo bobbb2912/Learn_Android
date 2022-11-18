@@ -1,0 +1,560 @@
+------------
+- AsyncTask
+B1: Chuan bi
+private class LoadHinh extends AsyncTask<String, Integer, Bitmap> {
+
+        Bitmap bmp = null;
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                URL u = new URL(strings[0]);
+                bmp = BitmapFactory.decodeStream(u.openConnection().getInputStream());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bmp;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            imgHinh.setImageBitmap(bitmap);
+        }
+    }
+B2: chay
+new LoadHinh().execute(edtLink.getText().toString());
+B3: cap phat su dung internet, trong manifest
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+----------------------------------------------------
+- background
+layout = (ConstraintLayout) findViewById(R.id.layout);
+layout.setBackgroundResource(R.drawable.ic_launcher_background);
+----------------------------------------------------
+- toggle button and switch
+tg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(tg.isChecked() == true) {
+                    txtTrangThai1.setText("ON");
+                }else {
+                    txtTrangThai2.setText("OFF");
+                }
+            }
+        });
+
+        swt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(swt.isChecked() == true) {
+                    txtTrangThai1.setText("ON");
+                }else {
+                    txtTrangThai1.setText("OFF");
+                }
+            }
+        });
+----------------------------------------------------
+-seekbar
+private void seekBar2() {
+        sk2.setProgress(5);
+        sk2.setMax(10);
+        int valCurrentsk2 = sk2.getProgress()+10;
+        txtKQ2.setText(String.valueOf(valCurrentsk2));
+        sk2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                i = i+10;
+                txtKQ2.setText(String.valueOf(i));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+----------------------------------------------------
+- Lay hinh bang identifier
+int resID = getResources().getIdentifier("baseline_date_range_black", "drawable", getPackageName());
+imgHinh.setImageResource(resID);
+----------------------------------------------------
+- dialog
+public void dialogSimple() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Thong bao")
+                .setMessage("Ban co chac muon xoa du lieu hay khong")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MainActivity.this, "Xoa thanh cong", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MainActivity.this, "chua xoa", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        builder.create().show();
+    }
+----------------------------------------------------
+public void dialogLayout() {
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+        View customView = inflater.inflate(R.layout.activity_custom_layout, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Thong bao")
+                .setMessage("Ban co chac muon xoa du lieu hay khong")
+                .setView(customView)
+                .setPositiveButton("co", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MainActivity.this, "Xoa thanh cong", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("khong", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MainActivity.this, "chua xoa", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setCancelable(false);
+        builder.create().show();
+    }
+----------------------------------------------------
+- count down timmer
+private void CountDown() {
+        //1s=1000 mili giay
+        CountDownTimer countDownTimer = new CountDownTimer(10000, 1000) {
+            @Override
+            //moi mot giay thi thuc hien cong viec
+            // l = millisUntilFinished: thoi gian con lai
+            public void onTick(long l) {
+//                dem+=1;
+//                txtKQ.setText(String.valueOf(dem));
+                txtKQ.setText("Thoi gian con lai: " + l/1000);
+                btnCountDown.setVisibility(View.INVISIBLE);
+                txtKQ.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            //khi hoan thanh cong viec gi do
+            public void onFinish() {
+                Toast.makeText(MainActivity.this, "xong", Toast.LENGTH_SHORT).show();
+                btnCountDown.setVisibility(View.VISIBLE);
+                txtKQ.setVisibility(View.GONE);
+            }
+        }.start();
+    }
+-----------------------------------------------------
+- an hien doi tuong
+btnCountDown.setVisibility(View.VISIBLE);//hien doi tuong
+txtKQ.setVisibility(View.GONE);//xoa doi tuong
+btnCountDown.setVisibility(View.INVISIBLE);//an doi tuong
+-----------------------------------------------------
+- chronometer
+Boolean flag=false;
+long timeWhenPause = 0;
+ @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnStart:
+                if(!flag) {
+                    long currentTime = SystemClock.elapsedRealtime()+timeWhenPause;
+                    chnDem.setBase(currentTime);
+                    chnDem.start();
+                    flag = true;
+                }
+
+                break;
+            case R.id.btnPause:
+                if (flag) {
+                    chnDem.stop();
+                    timeWhenPause = chnDem.getBase()-SystemClock.elapsedRealtime();
+                    flag=false;
+                }
+                break;
+            case R.id.btnStop:
+                if(flag){
+                    chnDem.stop();
+                    timeWhenPause=0;
+                    flag=false;
+                }
+
+                break;
+        }
+    }
+-----------------------------------------------------
+-Timer
+b1: tao bien toan cuc
+ImageView imgHinh;
+    Timer timer;
+    int []mangHinh={
+            R.drawable.anh1,
+            R.drawable.anh2,
+            R.drawable.anh3,
+            R.drawable.anh4,
+         
+    };
+    int i=0;
+b2: tao class myTask de quan ly cong viec:
+public class MyTask extends TimerTask {
+
+        ImageView imgHinh;
+        int []mangHinh={};
+
+        public MyTask(ImageView imgHinh, int[] mangHinh) {
+            this.imgHinh = imgHinh;
+            this.mangHinh = mangHinh;
+        }
+
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    imgHinh.setImageResource(mangHinh[i]);
+                    i+=1;
+                    if(i>10) {
+                        i=0;
+                    }
+                }
+            });
+        }
+    }
+B3: tao doi tuong
+MyTask myTask = new MyTask(imgHinh, mangHinh);
+B4: chay timer
+timer.scheduleAtFixedRate(myTask, 1000, 300);
+-----------------------------------------------------
+-random
+public int getRandom(int max){
+    return (int) (Math.random()*max);
+    }
+
+    public int getRandomMinMax(int min, int max) {
+        return (int) Math.floor(Math.random()*(max-min))+min;
+    }
+-----------------------------------------------------
+-chuyen man hinh nam ngang, chinh trong manifest, trong activity
+android:screenOrientation="landscape"
+-----------------------------------------------------
+Collections.addAll(img, hinh); // do du lieu tu mang vao arraylist :Collections.addAll(arrlist, arr);
+img.clear();//xoa het phan tu trong arraylist
+-----------------------------------------------------
+-animation
+link xem: https://www.tutorialspoint.com/android/android_animations.htm
+-----------------------------------------------------
+-listview
+ListView lvMonAn;
+    ArrayList<String> list = new ArrayList<>();
+    String ds[] = {"pho", "cha ca", "banh xeo", "cao lau", "rau muong", "nem ran", "goi cuon", "bun bo hue", "banh khot", "ga tan", "nom hoa chuoi", "bun bo nam bo", "hoa qua dam", "pho cuon", "ga nuong", "pho xao", "ca phe trung", "bo la lot", "xoi", "banh cuon"};
+
+public void init() {
+        lvMonAn = findViewById(R.id.lvMonAn);
+
+        Collections.addAll(list, ds);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, list);
+        lvMonAn.setAdapter(adapter);
+
+        lvMonAn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String monan = list.get(i);
+                Toast.makeText(MainActivity.this, monan, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+-----------------------------------------------------
+- listView_adapter
+Buoc 1: xay dung giao dien cho item
+Buoc 2: chuan bi du lieu
+Buoc 3: Do du lieu vao adapter
+Buoc 4: Gan adapter vao listView
+/////MainActivity.java
+public void init() {
+        lvDanhSach = findViewById(R.id.lvDanhSach);
+        Collections.addAll(hocSinhList, hocSinhArray);
+
+        CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, hocSinhList);
+        lvDanhSach.setAdapter(customAdapter);
+    }
+/////CustomAdapter.java
+public class CustomAdapter extends BaseAdapter {
+    Context context;
+    LayoutInflater inflater = null;
+    ArrayList<HocSinh> hocSinhList = new ArrayList<>();
+
+    public CustomAdapter(Context context, ArrayList<HocSinh> hocSinhList) {
+        this.context = context;
+        this.hocSinhList = hocSinhList;
+        inflater=(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    @Override
+    public int getCount() {
+        return hocSinhList.size();
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return hocSinhList.get(i);
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        if(view==null) {
+            view = inflater.inflate(R.layout.activity_dong, viewGroup,false);
+
+        }
+        ImageView imgHinh = (ImageView) view.findViewById(R.id.imgHinh);
+        TextView txtHoTen = (TextView) view.findViewById(R.id.txtHoTen);
+        TextView txtTuoi = (TextView) view.findViewById(R.id.txtTuoi);
+
+        txtHoTen.setText(hocSinhList.get(i).ten);
+        txtTuoi.setText(String.valueOf(hocSinhList.get(i).tuoi));
+	//  implementation 'com.squareup.picasso:picasso:2.3.3'
+        Picasso.with(context).load(hocSinhList.get(i).hinh).resize(100, 100).into(imgHinh);
+//        imgHinh.setImageResource(hocSinhList.get(i).hinh);
+        return view;
+-----------------------------------------------------
+- cap nhat du lieu cua listview
+customAdapter.notifyDataSetChanged();
+/////////xem dynamiclistview bai 44+45 :
+//https://drive.google.com/drive/folders/1ZK-XFP_DVqpepibgxG86U6qeySvW5HUs
+-----------------------------------------------------
+- tim kiem du lieu trong listView
+///
+public void TimKiem() {
+        edtTimKiem.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                adapter.getFilter().filter(editable.toString());
+            }
+        });
+    }
+-----------------------------------------------------
+- them vao listView
+
+//
+public void init() {
+        edtThem=findViewById(R.id.edtThem);
+        lvDanhSach=findViewById(R.id.lvDanhSach);
+
+        Collections.addAll(list, arr);
+
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, list);
+        lvDanhSach.setAdapter(adapter);
+        edtThem.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if(textView.getText().toString().trim().length()==0) {
+                    Toast.makeText(MainActivity.this, "Vui long nhap ho ten", Toast.LENGTH_SHORT).show();
+                } else {
+                    if(keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode()==KeyEvent.KEYCODE_ENTER) {
+//                        textView.setText("");
+                        list.add(textView.getText().toString().trim());
+                        adapter.notifyDataSetChanged();
+                        textView.setText("");
+//                        edtThem.requestFocus();
+                    }
+                }
+
+                return false;
+            }
+        });
+    }
+-----------------------------------------------------
+- PulltoRefresh_ListView, swipeRefresh_Layout
+///build_dependencies
+implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+//
+
+public void init() {
+        lvDanhSach = findViewById(R.id.lvDanhSach);
+        swipeLayout = findViewById(R.id.swipeLayout);
+
+        Collections.addAll(list, nameOld);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, list);
+        lvDanhSach.setAdapter(adapter);
+
+        //mau refresh
+        swipeLayout.setColorSchemeColors(Color.BLACK, Color.BLUE, Color.RED, Color.YELLOW, Color.CYAN);
+        swipeLayout.setDistanceToTriggerSync(100);
+        swipeLayout.setSize(SwipeRefreshLayout.LARGE);
+
+        swipeLayout.setOnRefreshListener(this);
+
+    }
+
+    @Override
+    public void onRefresh() {
+        new CountDownTimer(3000, 1000) {
+            @Override
+            public void onTick(long l) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                swipeLayout.setRefreshing(false);
+
+                list.clear();
+                Collections.addAll(list, nameNew);
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, list);
+                lvDanhSach.setAdapter(adapter);
+
+            }
+        }.start();
+    }
+-----------------------------------------------------
+-intent: di chuyen cac man hinh
+
+btnMHinh2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ManHinh3.this, ManHinh2.class);
+                startActivity(intent);
+            }
+        });
+-----------------------------------------------------
+- quay ve man hinh
+///trong manifest
+<activity
+            android:name=".ManHinh2"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"
+                />
+        </activity>
+-----------------------------------------------------
+- actionBar Setup:
+
+//
+public void actionBarSetUp() {
+        try {
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setTitle("Man Hinh 2"); //thiet lap tieu de
+//            String title = actionBar.getTitle(); // Lay tieu de
+//            actionBar.hide(); // an acctitonBar
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+-----------------------------------------------------
+-truyen tham so giua hai man hinh
+
+/////////////man hinh 1
+btnGui.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(edtHoTen.getText().toString().trim().length()<=0 || edtTuoi.getText().toString().trim().length()<=0) {
+                    Toast.makeText(MainActivity.this, "Vui long dien day du thong tin", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(MainActivity.this, ManHinh2.class);
+                    intent.putExtra("ten", edtHoTen.getText().toString().trim());
+                    intent.putExtra("tuoi", Integer.parseInt(edtTuoi.getText().toString().trim()));
+
+                    startActivity(intent);
+                }
+
+            }
+        });
+//////////////////man hinh 2
+ public void init() {
+        txtHoTen = findViewById(R.id.txtHoTen);
+        txtTuoi = findViewById(R.id.txtTuoi);
+
+        Bundle bundle = getIntent().getExtras();
+        if(bundle!=null) {
+            String hoTen = bundle.getString("ten");
+            int tuoi = bundle.getInt("tuoi");
+
+            String strTen = "Ho ten: " + hoTen;
+            String strTuoi = "Tuoi: " + String.valueOf(tuoi);
+            txtHoTen.setText(strTen);
+            txtTuoi.setText(strTuoi);
+        }
+    }
+
+-----------------------------------------------------
+-MediaPlayer _ MP3 local
+public void init(){
+        btnStop = findViewById(R.id.btnStop);
+        btnPlay = findViewById(R.id.btnPlay);
+        btnPause = findViewById(R.id.btnPause);
+
+        btnStop.setOnClickListener(this);
+        btnPlay.setOnClickListener(this);
+        btnPause.setOnClickListener(this);
+
+        song = MediaPlayer.create(MainActivity.this, R.raw.tothemoon);
+//
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnStop:
+                song.pause();
+                song = MediaPlayer.create(MainActivity.this, R.raw.tothemoon);
+                break;
+            case R.id.btnPlay:
+                song.start();
+                break;
+            case R.id.btnPause:
+                song.pause();
+                break;
+        }
+-----------------------------------------------------
+- video local: sudung setvideoPath
+public void init() {
+        video = findViewById(R.id.video);
+
+        video.setMediaController(new MediaController(MainActivity.this));
+//        video.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video));
+        video.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.video);
+        video.start();
+    }
+
+-----------------------------------------------------
+-MP3 online
+song = MediaPlayer.create(MainActivity.this, Uri.parse(
+                "https://mp3-320s1-zmp3.zmdcdn.me/38ef74ebd1af38f161be/8398526085473003844?authen=exp=1651493690~acl=/38ef74ebd1af38f161be/*~hmac=9573cac08ed018d3d4030db734ffe65a&fs=MTY1MTMyMDg5MDAyM3x3ZWJWNnwxMDQ2NzkyNTM4fDExOC43MS4xNjUdUngOA"
+        ));
+-----------------------------------------------------
+-convert Time: milisecond->second
+    public void convertTime(TextView tv, int time) {
+        NumberFormat f = new DecimalFormat("00");
+        long timeMinutes = TimeUnit.MILLISECONDS.toMinutes((long) time);
+        long timeSeconds = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(timeMinutes);
+        String result = f.format(timeMinutes) + " : " + f.format(timeSeconds);
+        tv.setText(result);
+    }
